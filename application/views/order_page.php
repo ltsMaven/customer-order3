@@ -180,7 +180,20 @@
                             <table class="table table-borderless mb-0">
                                 <tbody id="specModal-body">
                                     <?php if (!empty($items)): ?>
-                                        <?php foreach ($items as $item): ?>
+                                        <?php foreach ($items as $item):
+
+                                            $details = sprintf(
+                                                '%s — %s%s / %sMD x %s%s / %s / %s %s',
+                                                $item['description'],
+                                                $item['size'],
+                                                $item['satuan'],
+                                                $item['width'],
+                                                $item['length'],
+                                                $item['satuan_panjang'],
+                                                $item['color'],
+                                                $item['tate_yoko'],
+                                                $item['ikatan']
+                                            ); ?>
                                             <tr class="bg-light mb-2" data-id="<?= $item['id'] ?>"
                                                 data-tate="<?= html_escape($item['tate_yoko']) ?>"
                                                 data-ikatan="<?= html_escape($item['ikatan']) ?>"
@@ -192,8 +205,8 @@
                                                 data-satuan-panjang="<?= html_escape($item['satuan_panjang']) ?>"
                                                 data-color="<?= html_escape($item['color']) ?>"
                                                 data-jumlah="<?= html_escape($item['pieces']) ?>">
-                                                <td class="fw-bold py-3"><?= html_escape($item['description']) ?></td>
-                                                <td class="text-center py-3"><?= html_escape($item['pieces']) ?></td>
+                                                <td class="fw-bold py-3"><?= html_escape($details) ?></td>
+                                                <td class="text py-3"><?= html_escape($item['pieces']) ?></td>
                                                 <td class="text-end py-4">
                                                     <button type="button" class="btn btn-sm btn-outline-warning edit-item">
                                                         Edit

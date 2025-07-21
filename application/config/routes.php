@@ -61,6 +61,8 @@ $route['order/add_item'] = 'order/add_item';
 $route['order/delete/(:num)'] = 'order/delete/$1';
 $route['order/update/(:num)'] = 'order/update_item/$1';
 $route['order/live'] = 'order/live';
+$route['order/finalize/(:num)'] = 'order/finalize_item/$1';
+
 // admin’s live page (with dropdown)
 $route['admin/order/live'] = 'order/live_admin';
 $route['admin'] = 'admin/dashboard';

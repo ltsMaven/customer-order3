@@ -73,7 +73,15 @@
                                     <td><?= html_escape($item['pieces']) ?></td>
                                     <td><?= $status ?></td>
                                     <td>
-                                        <?php if ((int) $item['visible'] < 2): ?>
+                                        <?php
+                                        $vis = (int) $item['visible'];
+                                        if ($vis === 0) {
+                                            // not yet finalized → can finalize, edit or delete
+                                            ?>
+                                            <a href="<?= site_url("order/finalize/{$item['id']}") ?>"
+                                                class="btn btn-sm btn-success me-1">
+                                                Finalize
+                                            </a>
                                             <button type="button" class="btn btn-sm btn-warning edit-item" data-bs-toggle="modal"
                                                 data-bs-target="#editItemModal" data-id="<?= $item['id'] ?>"
                                                 data-description="<?= html_escape($item['description']) ?>"
@@ -89,9 +97,37 @@
                                                 data-id="<?= $item['id'] ?>">
                                                 Delete
                                             </button>
-                                        <?php else: ?>
-                                            <span class="text-muted">locked</span>
-                                        <?php endif; ?>
+
+                                        <?php
+                                        } else if ($vis === 1 || $vis === 2) {
+                                            // waiting approval or rejected → can only edit or delete
+                                            ?>
+                                                <button type="button" class="btn btn-sm btn-warning edit-item" data-bs-toggle="modal"
+                                                    data-bs-target="#editItemModal" data-id="<?= $item['id'] ?>"
+                                                    data-description="<?= html_escape($item['description']) ?>"
+                                                    data-size="<?= $item['size'] ?>" data-satuan="<?= html_escape($item['satuan']) ?>"
+                                                    data-width="<?= $item['width'] ?>" data-length="<?= $item['length'] ?>"
+                                                    data-satuan-panjang="<?= html_escape($item['satuan_panjang']) ?>"
+                                                    data-color="<?= html_escape($item['color']) ?>"
+                                                    data-tate="<?= html_escape($item['tate_yoko']) ?>"
+                                                    data-ikatan="<?= html_escape($item['ikatan']) ?>" data-pieces="<?= $item['pieces'] ?>">
+                                                    Edit
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger delete-item"
+                                                    data-id="<?= $item['id'] ?>">
+                                                    Delete
+                                                </button>
+
+                                            <?php
+                                        } else if ($vis === 3) {
+                                            // approved → only “Agree Order” action
+                                            ?>
+                                                    <button type="button" class="btn btn-sm btn-primary">
+                                                        Agree Order
+                                                    </button>
+                                            <?php
+                                        }
+                                        ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

@@ -114,6 +114,17 @@ class Order extends CI_Controller
                 ->set_content_type('application/json')
                 ->set_output(json_encode(['success' => false]));
         }
+        // 2) numeric non-negativity check
+        foreach (['size', 'width', 'length', 'jumlah'] as $fld) {
+            if (!isset($i[$fld]) || !is_numeric($i[$fld]) || $i[$fld] < 0) {
+                return $this->output
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode([
+                        'success' => false,
+                        'error' => ucfirst($fld) . ' must be a non-negative number'
+                    ]));
+            }
+        }
 
         $newId = $this->Order_model->insert_order_item($order_id, $i);
         return $this->output
@@ -163,6 +174,17 @@ class Order extends CI_Controller
                     ->set_output(json_encode(['success' => false, 'error' => "missing {$f}"]));
             }
         }
+        // 2) numeric non-negativity check
+        foreach (['size', 'width', 'length', 'jumlah'] as $fld) {
+            if (!is_numeric($input[$fld]) || $input[$fld] < 0) {
+                return $this->output
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode([
+                        'success' => false,
+                        'error' => ucfirst($fld) . ' must be a non-negative number'
+                    ]));
+            }
+        }
 
         $data = [
             'tate_yoko' => $input['tate_yoko'],
@@ -181,6 +203,26 @@ class Order extends CI_Controller
         return $this->output
             ->set_content_type('application/json')
             ->set_output(json_encode(['success' => $ok]));
+    }
+
+    public function finalize_item(int $itemId)
+    {
+        // ensure agent is logged in
+        if (!$this->session->userdata('logged_in')) {
+            return redirect('login');
+        }
+
+        // set only that one item
+        $ok = $this->Order_model->set_item_status($itemId, 1);
+
+        if ($ok) {
+            $this->session->set_flashdata('success_msg', 'Item finalized.');
+        } else {
+            $this->session->set_flashdata('error_msg', 'Could not finalize item.');
+        }
+
+        // back to live‐order page
+        return redirect('order/live');
     }
 
     public function live()

@@ -123,6 +123,7 @@ class Order_model extends CI_Model
     {
         return $this->db
             ->where('order_id', $orderId)
+            ->where('visible', 0)
             ->update('order_items', ['visible' => 1]);
 
     }
