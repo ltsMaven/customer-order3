@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		const btn = e.target.closest(".delete-item");
 		if (!btn) return;
 
+		const ok = window.confirm("Are you sure you want to delete this item?");
+		if (!ok) return;
+
 		const itemId = btn.dataset.id;
 		if (!itemId) {
 			return alert("Error: missing item ID");
@@ -99,9 +102,14 @@ document.addEventListener("DOMContentLoaded", () => {
 			tr.dataset.color = item.color;
 			tr.dataset.jumlah = item.jumlah;
 
+			const details =
+				`${item.description} — ${item.size}${item.satuan} / ` +
+				`${item.width}MD x ${item.length}${item.satuan_panjang} / ` +
+				`${item.color} / ${item.tate_yoko} ${item.ikatan}`;
+
 			// 2) now fill the HTML (make sure you include both buttons!)
 			tr.innerHTML = `
-  <td>${item.description}</td>
+  <td>${details}</td>
   <td class="text-center">${item.jumlah}</td>
   <td class="text-end">
     <button type="button" class="btn btn-sm btn-outline-warning edit-item">
@@ -195,21 +203,22 @@ document.addEventListener("DOMContentLoaded", () => {
 					body: JSON.stringify(payload),
 				}
 			);
-			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			const json = await res.json();
-			if (!json.success) {
-				return alert("Update failed: " + (json.error || "unknown"));
-			}
+			if (!json.success) throw new Error(json.error || "Update failed");
 
-			// 3) reflect changes in the table row
+			// update the row in the modal body
 			const row = modalBody.querySelector(`tr[data-id="${itemId}"]`);
-			// update its dataset
-			Object.keys(payload).forEach((k) => {
-				row.dataset[k] = payload[k];
-			});
-			// update the two visible cells
-			row.children[0].textContent = payload.description;
-			row.children[1].textContent = payload.jumlah;
+			Object.assign(row.dataset, payload);
+
+			// reconstruct the full “details” string exactly like PHP
+			const D = row.dataset;
+			const updatedDetails =
+				`${D.description} — ${D.size}${D.satuan} / ` +
+				`${D.width}MD x ${D.length}${D.satuan_panjang} / ` +
+				`${D.color} / ${D.tate_yoko} ${D.ikatan}`;
+
+			row.children[0].textContent = updatedDetails;
+			row.children[1].textContent = D.jumlah;
 
 			bsEdit.hide();
 		} catch (err) {
