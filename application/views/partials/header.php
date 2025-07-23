@@ -1,9 +1,9 @@
 <!-- application/views/partials/header.php -->
 <nav class="navbar navbar-light bg-light fixed-top" style="height:56px;">
     <div class="container-fluid">
-        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar"
-            aria-controls="sidebar">
-            <span class="navbar-toggler-icon"></span>
+        <button class="navbar-toggler card card-stats" type="button" data-bs-toggle="offcanvas"
+            data-bs-target="#sidebar" aria-controls="sidebar">
+            <img src="<?= base_url('assets/images/hamburger.svg') ?>" alt="Cart" style="width: 35px; height: 35px;">
         </button>
         <span
             class="navbar-brand mb-0 h1"><?= htmlspecialchars($first_name . ' ' . $last_name, ENT_QUOTES, 'UTF-8') ?></span>
@@ -32,5 +32,11 @@
         transition:
             transform 0.4s ease-in-out,
             visibility 0s;
+    }
+
+    .card:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px #0049b7;
+        border-radius: 8px;
     }
 </style>

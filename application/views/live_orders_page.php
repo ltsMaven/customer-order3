@@ -1,4 +1,16 @@
-<!DOCTYPE html>
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+// build a map: item_id → [expected_time, reject_reason]
+$reasonMap = [];
+foreach ($status_items as $s) {
+    // oi.id is the correct item_id here
+    $reasonMap[$s['id']] = [
+        'expected_time' => $s['expected_time'] ?? null,
+        'reject_reason' => $s['reject_reason'] ?? null,
+    ];
+}
+?><!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -49,6 +61,8 @@
                                     $item['ikatan']              // Ikatan
                                 );
 
+                                $st = $reasonMap[$item['id']] ?? ['expected_time' => null, 'reject_reason' => null];
+
                                 // Map visible → status text
                                 switch ((int) $item['visible']) {
                                     case 0:
@@ -61,7 +75,9 @@
                                         $status = 'Rejected';
                                         break;
                                     case 3:
-                                        $status = 'Approved (Expected Time: )';
+                                        $status = 'Approved (ETA: '
+                                            . html_escape($st['expected_time'] ?? '–')
+                                            . ')';
                                         break;
                                     default:
                                         $status = 'Unknown';
@@ -98,8 +114,8 @@
                                                 Delete
                                             </button>
 
-                                        <?php
-                                        } else if ($vis === 1 || $vis === 2) {
+                                            <?php
+                                        } else if ($vis === 1) {
                                             // waiting approval or rejected → can only edit or delete
                                             ?>
                                                 <button type="button" class="btn btn-sm btn-warning edit-item" data-bs-toggle="modal"
@@ -119,12 +135,20 @@
                                                 </button>
 
                                             <?php
+                                        } else if ($vis === 2) {
+                                            ?>
+                                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                        data-bs-target="#viewReasonModal"
+                                                        data-reason="<?= html_escape($st['reject_reason']) ?>">
+                                                        View Reason
+                                                    </button>
+                                            <?php
                                         } else if ($vis === 3) {
                                             // approved → only “Agree Order” action
                                             ?>
-                                                    <button type="button" class="btn btn-sm btn-primary">
-                                                        Agree Order
-                                                    </button>
+                                                        <button type="button" class="btn btn-sm btn-primary">
+                                                            Agree Order
+                                                        </button>
                                             <?php
                                         }
                                         ?>
@@ -225,6 +249,23 @@
         </div>
     </div>
 
+    <div class="modal fade" id="viewReasonModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rejection Reason</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="view-reason-text" class="mb-0"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="<?= base_url('assets/js/bootstrap.bundle.min.js') ?>"></script>
     <script>
         (() => {
@@ -303,6 +344,13 @@
                     alert('Error deleting: ' + err.message);
                 }
             });
+
+            document.getElementById('viewReasonModal')
+                .addEventListener('show.bs.modal', function (e) {
+                    const btn = e.relatedTarget;
+                    const reason = btn.dataset.reason || 'No reason provided';
+                    this.querySelector('#view-reason-text').textContent = reason;
+                });
         })();
     </script>
     <script>

@@ -138,9 +138,11 @@
                             <button type="button" id="add-item" class="btn btn-warning btn-icon me-3">
                                 +
                             </button>
-                            <button type="button" id="add-to-cart" class="btn btn-warning btn-icon"
-                                data-bs-toggle="modal" data-bs-target="#specModal">
-                                🛒
+                            <button type="button" id="add-to-cart"
+                                class="btn btn-warning btn-icon d-flex justify-content-center align-items-center"
+                                data-bs-toggle="modal" data-bs-target="#specModal" style="padding: 0.5rem;">
+                                <img src="<?= base_url('assets/images/shopping-cart.svg') ?>" alt="Cart"
+                                    style="width: 25px; height: 25px; margin-right: 2px;">
                             </button>
                         </div>
                         <input type="hidden" name="cart_data" id="cart-data" value="">

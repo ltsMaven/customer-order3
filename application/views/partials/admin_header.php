@@ -3,7 +3,8 @@
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebar"
             aria-controls="adminSidebar">
-            <span class="navbar-toggler-icon"></span>
+            <img src="<?= base_url('assets/images/hamburger.svg') ?>" alt="Cart"
+                style="width: 35px; height: 35px;">
         </button>
         <span
             class="navbar-brand mb-0 h1"><?= htmlspecialchars($first_name . ' ' . $last_name, ENT_QUOTES, 'UTF-8') ?></span>

@@ -54,6 +54,8 @@ $route['default_controller'] = 'auth/login';
 $route['login'] = 'auth/login';
 $route['logout'] = 'auth/logout';
 $route['dashboard'] = 'dashboard';
+
+
 $route['order'] = 'order/index';
 $route['order/existing'] = 'order/existing';
 $route['order/choose'] = 'order/choose';
@@ -67,7 +69,10 @@ $route['order/finalize/(:num)'] = 'order/finalize_item/$1';
 $route['admin/order/live'] = 'order/live_admin';
 $route['admin'] = 'admin/dashboard';
 $route['admin/dashboard'] = 'admin/dashboard';
-$route['admin/order/approve/(:num)'] = 'order/approve_item/$1';
-$route['admin/order/reject/(:num)'] = 'order/reject_item/$1';
+$route['admin/order/approve_item/(:num)'] = 'order/approve_item/$1';
+$route['admin/order/reject_item/(:num)'] = 'order/reject_item/$1';
+
+
+
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

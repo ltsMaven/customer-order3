@@ -136,6 +136,8 @@ class Order extends CI_Controller
                 'jumlah' => $i['jumlah'],
             ]));
     }
+
+
     public function delete($itemId)
     {
         // only allow agents who have an active order in session
@@ -237,6 +239,8 @@ class Order extends CI_Controller
         // 2) fetch that customer record + their items
         $data['customer'] = $this->Order_model->get_order_by_id($custId);
         $data['items'] = $this->Order_model->get_items_by_order($custId);
+        $data['status_items'] = $this->Order_model
+            ->get_items_status_by_order_admin($custId);
 
         // 3) render
         $this->load->view('live_orders_page', $data);
@@ -259,6 +263,7 @@ class Order extends CI_Controller
         if ($custId) {
             $data['customer'] = $this->Order_model->get_order_by_id($custId);
             $data['items'] = $this->Order_model->get_items_by_order_admin($custId);
+            $data['status_items'] = $this->Order_model->get_items_status_by_order_admin($custId);
         } else {
             $data['customer'] = null;
             $data['items'] = [];
@@ -266,37 +271,52 @@ class Order extends CI_Controller
 
         $this->load->view('admin/admin_live_orders_page', $data);
     }
-
     public function approve_item(int $itemId)
     {
         if ($this->session->userdata('role') !== 'admin') {
             show_error('Forbidden', 403);
         }
 
-        $ok = $this->Order_model->approve_item($itemId);
+        $expectedTime = $this->input->post('expected_time', true);
+
+        // prefer POST, otherwise fallback to GET
+        $existingOrderId = $this->input->post('existing_order_id', true);
+        if (empty($existingOrderId)) {
+            $existingOrderId = $this->input->get('existing_order_id', true) ?? '';
+        }
+
+        $ok = $this->Order_model->approve_item($itemId, $expectedTime);
         if (!$ok) {
             $this->session->set_flashdata('error_msg', 'Could not approve item.');
+        } else {
+            $this->session->set_flashdata('success_msg', 'Item approved.');
         }
-        // redirect back to the admin live‐order page, preserving the customer filter
-        $cust = $this->input->get('existing_order_id') ?? '';
-        redirect("admin/order/live?existing_order_id={$cust}");
+
+        // now this will be .../live?existing_order_id=4 even on a manual GET
+        redirect("admin/order/live?existing_order_id={$existingOrderId}");
     }
 
-    /**
-     * Reject a single order‐item (visible=2)
-     */
     public function reject_item(int $itemId)
     {
         if ($this->session->userdata('role') !== 'admin') {
             show_error('Forbidden', 403);
         }
 
-        $ok = $this->Order_model->reject_item($itemId);
+        $reason = $this->input->post('reason', true);
+
+        $existingOrderId = $this->input->post('existing_order_id', true);
+        if (empty($existingOrderId)) {
+            $existingOrderId = $this->input->get('existing_order_id', true) ?? '';
+        }
+
+        $ok = $this->Order_model->reject_item($itemId, $reason);
         if (!$ok) {
             $this->session->set_flashdata('error_msg', 'Could not reject item.');
+        } else {
+            $this->session->set_flashdata('success_msg', 'Item rejected.');
         }
-        $cust = $this->input->get('existing_order_id') ?? '';
-        redirect("admin/order/live?existing_order_id={$cust}");
+
+        redirect("admin/order/live?existing_order_id={$existingOrderId}");
     }
 
 

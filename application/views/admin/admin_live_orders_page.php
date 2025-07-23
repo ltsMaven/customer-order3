@@ -56,6 +56,7 @@
                                 <th>Status</th>
                                 <th>Action</th>
                                 <th>Time</th>
+                                <th>Reason</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -96,9 +97,9 @@
                                     <td><?= $status ?></td>
                                     <td>
                                         <?php if ((int) $item['visible'] < 2): // un-finalized or waiting ?>
-                                            <a href="<?= site_url("admin/order/approve/{$item['id']}?existing_order_id={$customer['id']}") ?>"
+                                            <a href="<?= site_url("admin/order/approve_item/{$item['id']}?existing_order_id={$customer['id']}") ?>"
                                                 class="btn btn-sm btn-success">Approve</a>
-                                            <a href="<?= site_url("admin/order/reject/{$item['id']}?existing_order_id={$customer['id']}") ?>"
+                                            <a href="<?= site_url("admin/order/reject_item/{$item['id']}?existing_order_id={$customer['id']}") ?>"
                                                 class="btn btn-sm btn-danger">Reject</a>
                                         <?php elseif ((int) $item['visible'] === 2): // rejected ?>
                                             <span class="text-warning">Rejected</span>
@@ -108,11 +109,21 @@
                                     </td>
 
                                     <td>
+                                        <?php if ((int) $item['visible'] === 2): ?>
+                                            <span class="text-muted">Locked</span>
+                                        <?php else: ?>
+                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#timeModal" data-item-id="<?= $item['id'] ?>"
+                                                data-existing-order-id="<?= $customer['id'] ?>">Send Expected Time</button>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
                                         <?php if ((int) $item['visible'] === 3): ?>
                                             <span class="text-muted">Locked</span>
                                         <?php else: ?>
-                                            <a href="<?= site_url("admin/order/send_expected_time/{$item['id']}?existing_order_id={$customer['id']}") ?>"
-                                                class="btn btn-sm btn-primary">Send Expected Time</a>
+                                            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                data-bs-target="#reasonModal" data-item-id="<?= $item['id'] ?>"
+                                                data-existing-order-id="<?= $customer['id'] ?>">?</button>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -124,11 +135,87 @@
                 <div class="alert alert-info">No orders found for this customer.</div>
             <?php endif; ?>
         <?php endif; ?>
+
+
+        <!-- Send Expected Time Modal -->
+        <div class="modal fade" id="timeModal" tabindex="-1">
+            <div class="modal-dialog">
+                <form method="post" class="modal-content">
+                    <!-- action will be injected by JS -->
+                    <div class="modal-header">
+                        <h5 class="modal-title">Send Estimated Time</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="existing_order_id" id="timeExistingOrder">
+                        <div class="mb-3">
+                            <label class="form-label">Expected Delivery Time</label>
+                            <input type="datetime-local" class="form-control" name="expected_time" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Send &amp; Approve</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Reject Reason Modal -->
+        <div class="modal fade" id="reasonModal" tabindex="-1">
+            <div class="modal-dialog">
+                <form method="post" class="modal-content">
+                    <!-- action will be injected by JS -->
+                    <div class="modal-header">
+                        <h5 class="modal-title">Reason for Rejection</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="existing_order_id" id="reasonExistingOrder">
+                        <div class="mb-3">
+                            <label class="form-label">Please explain why:</label>
+                            <textarea class="form-control" name="reason" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Reject Order</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </main>
 
     <!-- footer scripts -->
     <?php $this->load->view('partials/footer') ?>
 
 </body>
+
+<script>
+    // timeModal: swap its form.action to /admin/order/approve/{id}?existing_order_id={cust}
+    const baseApprove = '<?= site_url("admin/order/approve_item") ?>/';
+    const baseReject = '<?= site_url("admin/order/reject_item") ?>/';
+
+    // timeModal: POST to approve_item/{id}
+    document.getElementById('timeModal')
+        .addEventListener('show.bs.modal', function (e) {
+            const btn = e.relatedTarget;
+            const itemId = btn.dataset.itemId;
+            const custId = btn.dataset.existingOrderId;
+            const form = this.querySelector('form');
+            form.action = baseApprove + itemId + '?existing_order_id=' + custId;
+            document.getElementById('timeExistingOrder').value = custId;
+        });
+
+    // reasonModal: POST to reject_item/{id}
+    document.getElementById('reasonModal')
+        .addEventListener('show.bs.modal', function (e) {
+            const btn = e.relatedTarget;
+            const itemId = btn.dataset.itemId;
+            const custId = btn.dataset.existingOrderId;
+            const form = this.querySelector('form');
+            form.action = baseReject + itemId + '?existing_order_id=' + custId;
+            document.getElementById('reasonExistingOrder').value = custId;
+        });
+</script>
 
 </html>

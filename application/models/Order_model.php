@@ -84,6 +84,18 @@ class Order_model extends CI_Model
             ->result_array();
     }
 
+
+    public function get_items_status_by_order_admin(int $orderId): array
+{
+    return $this->db
+        ->select('oi.*, s.expected_time, s.reject_reason')
+        ->from('order_items AS oi')
+        ->join('item_status AS s', 's.item_id = oi.id', 'left')
+        ->where('oi.order_id', $orderId)
+        ->get()
+        ->result_array();
+}
+
     public function get_unfinalized_items(int $orderId)
     {
         return $this->db
@@ -109,6 +121,22 @@ class Order_model extends CI_Model
 
 
 
+    //admin
+    protected function record_item_status(int $itemId, int $status, ?string $expectedTime = null, ?string $reason = null): bool
+    {
+        $data = [
+            'item_id' => $itemId,
+            'visible' => $status,
+            'expected_time' => $expectedTime,
+            'reject_reason' => $reason,
+            // `created_at` will default to CURRENT_TIMESTAMP
+        ];
+
+        $this->db->insert('item_status', $data);
+        return $this->db->affected_rows() > 0;
+    }
+
+
     public function set_item_status(int $itemId, int $status): bool
     {
         $this->db
@@ -128,13 +156,42 @@ class Order_model extends CI_Model
 
     }
 
-    /** Convenience wrappers */
-    public function approve_item($itemId)
+
+
+    public function approve_item(int $itemId, ?string $expectedTime = null): bool
     {
-        return $this->set_item_status($itemId, 3);
+
+        if (empty($expectedTime)) {
+            return false;
+        }
+        // 1) update the live flag
+        $ok1 = $this->set_item_status($itemId, 3);
+
+        // 2) record the history
+        $ok2 = $this->record_item_status($itemId, 3, $expectedTime, null);
+
+        return $ok1 && $ok2;
     }
-    public function reject_item($itemId)
+
+    /**
+     * Reject an item: update both order_items and write item_status.
+     */
+    public function reject_item(int $itemId, ?string $reason = null): bool
     {
-        return $this->set_item_status($itemId, 2);
+        if (empty(trim($reason))) {
+            return false; // guard: must supply a reason
+        }
+        $ok1 = $this->set_item_status($itemId, 2);
+        $ok2 = $this->record_item_status($itemId, 2, null, $reason);
+
+        return $ok1 && $ok2;
     }
+
+
+
+
+
+
+
+
 }
