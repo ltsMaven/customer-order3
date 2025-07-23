@@ -62,6 +62,15 @@ class Order_model extends CI_Model
             ->count_all_results();
     }
 
+    public function count_order_by_id(int $orderId, int $visible)
+    {
+        return $this->db
+            ->from('order_items')
+            ->where('order_id', $orderId)
+            ->where('visible', $visible)
+            ->count_all_results();
+    }
+
     public function get_all_orders()
     {
         return $this->db->get('orders')->result_array();
@@ -86,15 +95,15 @@ class Order_model extends CI_Model
 
 
     public function get_items_status_by_order_admin(int $orderId): array
-{
-    return $this->db
-        ->select('oi.*, s.expected_time, s.reject_reason')
-        ->from('order_items AS oi')
-        ->join('item_status AS s', 's.item_id = oi.id', 'left')
-        ->where('oi.order_id', $orderId)
-        ->get()
-        ->result_array();
-}
+    {
+        return $this->db
+            ->select('oi.*, s.expected_time, s.reject_reason')
+            ->from('order_items AS oi')
+            ->join('item_status AS s', 's.item_id = oi.id', 'left')
+            ->where('oi.order_id', $orderId)
+            ->get()
+            ->result_array();
+    }
 
     public function get_unfinalized_items(int $orderId)
     {

@@ -20,6 +20,7 @@ class Dashboard extends CI_Controller
 
     public function index()
     {
+
         // gather whatever stats you like
         $data = [
             'first_name' => $this->session->userdata('first_name'),
@@ -27,10 +28,6 @@ class Dashboard extends CI_Controller
             'total_agents' => $this->Agent_model->count_all(),
         ];
 
-        // render
-        // $this->load->view('partials/header', $data);
-        // $this->load->view('partials/sidebar', $data);
         $this->load->view('admin/admin_dashboard_page', $data);
-        // $this->load->view('partials/footer', $data);
     }
 }
