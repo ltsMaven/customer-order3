@@ -135,21 +135,24 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-center mb-4">
-                            <button type="button" id="add-item" class="btn btn-warning btn-icon me-3">
-                                +
+                            <button type="button" id="add-item"
+                                class="btn btn-warning d-inline-flex align-items-center px-4 py-2 gap-2">
+                                + Tambah Item
                             </button>
                             <button type="button" id="add-to-cart"
-                                class="btn btn-warning btn-icon d-flex justify-content-center align-items-center"
+                                class="btn btn-warning d-inline-flex align-items-center px-4 py-2 ms-3"
                                 data-bs-toggle="modal" data-bs-target="#specModal" style="padding: 0.5rem;">
                                 <img src="<?= base_url('assets/images/shopping-cart.svg') ?>" alt="Cart"
                                     style="width: 25px; height: 25px; margin-right: 2px;">
+                                Lihat Keranjang
                             </button>
                         </div>
                         <input type="hidden" name="cart_data" id="cart-data" value="">
-
-                        <div class=" text-center">
-                            <button type="submit" formnovalidate class="btn btn-success px-5">Pesan Order</button>
-                        </div>
+                    </div>
+                    <div class=" text-center">
+                        <button type="submit" formnovalidate class="btn btn-success px-5"> <img
+                                src="<?= base_url('assets/images/pesan.svg') ?>" alt="Cart"
+                                style="width: 25px; height: 25px; margin-right: 2px;">Pesan Order</button>
                     </div>
                 </form>
             </div>

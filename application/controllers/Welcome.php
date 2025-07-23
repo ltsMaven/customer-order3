@@ -56,7 +56,7 @@ class Welcome extends CI_Controller
 		$this->form_validation->set_rules('email', 'Email', 'required|valid_email');
 		$this->form_validation->set_rules('address', 'Alamat', 'required');
 		$this->form_validation->set_rules('city', 'Kota', 'alpha');
-		$this->form_validation->set_rules('state', 'Provinsi', 'alpha');
+		$this->form_validation->set_rules('state', 'Provinsi', 'required');
 		$this->form_validation->set_rules('address', 'Address', 'required');
 		$this->form_validation->set_rules('country', 'Country', 'required');
 		$this->form_validation->set_rules(
@@ -94,7 +94,6 @@ class Welcome extends CI_Controller
 			'address' => $this->input->post('address', TRUE),
 			'city' => $this->input->post('city', TRUE),
 			'state' => $this->input->post('state', TRUE),
-			'address' => $this->input->post('address', TRUE),
 			'country' => $this->input->post('country', TRUE),
 			'username' => $this->input->post('username', TRUE),
 			'password' => $this->input->post('password', TRUE),
